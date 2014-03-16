@@ -1,2 +1,2 @@
 #!/bin/sh
-carton exec ert-runner
+cask exec ert-runner
