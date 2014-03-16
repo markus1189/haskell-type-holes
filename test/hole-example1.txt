@@ -1,0 +1,13 @@
+Found hole ‘_’ with type: a -> Identity a
+    Where: ‘a’ is a rigid type variable bound by
+               the type signature for set :: Lens' s a -> a -> s -> s
+               at /tmp/flycheck26256YnM/lenses.hs:17:8
+    Relevant bindings include
+      whole :: s (bound at /tmp/flycheck26256YnM/lenses.hs:18:9)
+      x :: a (bound at /tmp/flycheck26256YnM/lenses.hs:18:7)
+      l :: Lens' s a (bound at /tmp/flycheck26256YnM/lenses.hs:18:5)
+      set :: Lens' s a -> a -> s -> s (bound at /tmp/flycheck26256YnM/lenses.hs:18:1)
+      set :: Lens' s a -> a -> s -> s      (bound at /tmp/flycheck26256YnM/lenses.hs:18:1)
+    In the expression: _
+    In the second argument of ‘($)’, namely ‘_ x’
+    In the first argument of ‘l’, namely ‘(const $ _ x)’

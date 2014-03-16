@@ -1,0 +1,9 @@
+Found hole ‘_’ with type: (a0 -> a0, Candidate -> Value)
+ -> Candidate -> Candidate
+    Where: ‘a0’ is an ambiguous type variable
+    Relevant bindings include
+      candidates :: Data -> [Candidate]
+        (bound at /tmp/flycheck26256sAh/MakingACentury.hs:14:1)
+    In the expression: _
+    In the first argument of ‘map’, namely ‘(_ (id, value))’
+    In the first argument of ‘(.)’, namely ‘map (_ (id, value))’
