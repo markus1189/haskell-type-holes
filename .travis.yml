@@ -19,5 +19,5 @@ env:
   - EMACS=emacs24
   - EMACS=emacs-snapshot
 script:
-  $EMACS --version
-  ./travis-ci.sh
+  - $EMACS --version
+  - ./travis-ci.sh
