@@ -1,5 +1,3 @@
-(require 's)
-
 (defgroup haskell-type-holes nil "Haskell type holes functions.")
 
 (defcustom th-get-type-hole-info-function
