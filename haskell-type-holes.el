@@ -26,14 +26,14 @@
                  (function-item :tag "Below current decl" :value th--below-current-decl)
                  (function :tag "Custom function")))
 
-(defun th-hole-type (str)
+(defun th--get-hole-type (str)
   "Get the type of the hole described by STR."
   (string-match "Found hole ‘_’\\(\n\s*\\)? with type: \\([\0-\377[:nonascii:]]*\\)\n\s+Where:" str)
   (s-collapse-whitespace (replace-regexp-in-string "\n" "" (match-string 2 str))))
 
 (defun th-new-function-from-hole (str &optional add-parens add-arg-holes)
   (let* ((fn-name (read-string "Name for new function: "))
-         (fn-with-type (concat fn-name " :: " (th-hole-type str) "\n" fn-name " = _"))
+         (fn-with-type (concat fn-name " :: " (th--get-hole-type str) "\n" fn-name " = _"))
          (fn-with-arg-holes (if add-arg-holes
                                 (s-join " " (list fn-name
                                                   (th--create-arg-holes fn-with-type)))
@@ -125,7 +125,7 @@
   (newline 2))
 
 (defun th-resolve-hole-via-hoogle (str)
-  (let ((hole-type (th-hole-type str)))
+  (let ((hole-type (th--get-hole-type str)))
     (funcall completing-read-function "What to insert: " (th-hoogle-search hole-type))))
 
 (defun th-resolve-hole-via-hoogle-here ()
