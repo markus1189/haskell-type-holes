@@ -12,7 +12,7 @@ before_install:
       sudo apt-get install -qq
           emacs24 emacs24-el emacs24-common-non-dfsg;
     fi
-  - curl -fsSkL https://gist.github.com/rejeep/7736123/raw | sh
+  - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
   - export PATH="/home/travis/.cask/bin:$PATH"
   - cask
 env:
@@ -20,4 +20,4 @@ env:
   - EMACS=emacs-snapshot
 script:
   $EMACS --version
-  ./run-travis-ci.sh
+  ./travis-ci.sh
