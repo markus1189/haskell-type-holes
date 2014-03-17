@@ -1,4 +1,5 @@
 language: emacs-lisp
+
 before_install:
   - sudo mkdir /usr/local/evm
   - sudo chown travis:travis /usr/local/evm
@@ -10,8 +11,10 @@ before_install:
 
   - evm install $EVM_EMACS --use
   - cask
+
 env:
   - EVM_EMACS=emacs-24.3-bin
+
 script:
   - emacs --version
   - ./travis-ci.sh
