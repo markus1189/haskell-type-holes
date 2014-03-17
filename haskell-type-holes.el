@@ -1,11 +1,25 @@
 (defgroup haskell-type-holes nil "Haskell type holes functions.")
 
-(defcustom th-get-type-hole-info-function
-  (lambda ()
-    (flycheck-error-message (car (flycheck-overlay-errors-at (point)))))
+(define-minor-mode hs-type-holes-mode
+  "Toggle type-hole mode."
+  nil
+  " ‘_’"
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-k C-h") 'th-resolve-hole-via-hoogle-here)
+    (define-key map (kbd "C-c C-k C-b") 'th-insert-relevant-binding-here)
+    (define-key map (kbd "C-c C-k C-f") 'th-new-function-from-hole-here)
+    (define-key map (kbd "C-c C-k C-t") 'th-toggle-type-hole-undefined-line)
+    map))
+
+(defun th--get-type-hole-info-flycheck ()
+  (flycheck-error-message (car (flycheck-overlay-errors-at (point)))))
+
+(defcustom th-get-type-hole-info-function 'th--get-type-hole-info-flycheck
   "Function to get the information about the type hole at point."
   :group 'haskell-type-holes
-  :type 'function)
+  :type '(choice
+	  (function-item :tag "Use flycheck" th--get-type-hole-info-flycheck)
+	  (function :tag "Custom function")))
 
 (defcustom th-insert-argument-holes nil
   "If t, insert holes for the arguments of the binding inserted."
@@ -161,10 +175,5 @@
         (when found
           (backward-kill-word 1)
           (insert (cdr (assoc found toggle-alist))))))))
-
-;; (define-key haskell-mode-map (kbd "C-c C-k C-h") 'th-resolve-hole-via-hoogle-here)
-;; (define-key haskell-mode-map (kbd "C-c C-k C-b") 'th-insert-relevant-binding-here)
-;; (define-key haskell-mode-map (kbd "C-c C-k C-f") 'th-new-function-from-hole-here)
-;; (define-key haskell-mode-map (kbd "C-c C-k C-t") 'th-toggle-type-hole-undefined-line)
 
 (provide 'haskell-type-holes)
