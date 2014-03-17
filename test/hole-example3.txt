@@ -1,0 +1,12 @@
+Found hole ‘_’
+      with type: (p0 [RTerm] (f0 [RTerm])
+                  -> p0 RExpression (f0 RExpression))
+                 -> RExpression -> [Term]
+    Where: ‘p0’ is an ambiguous type variable
+           ‘f0’ is an ambiguous type variable
+    Relevant bindings include
+      valExpr' :: RExpression -> Int
+        (bound at /tmp/flycheck2352Eq2/MakingACentury.hs:55:1)
+    In the expression: _
+    In the second argument of ‘(.)’, namely ‘_ getTerms’
+    In the second argument of ‘(.)’, namely ‘map valTerm . _ getTerms’

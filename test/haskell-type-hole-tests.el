@@ -37,4 +37,9 @@
   (should (string= "(a0 -> a0, Candidate -> Value) -> Candidate -> Candidate"
                    (th--get-hole-type (hth/load-hole 2)))))
 
+(ert-deftest get-type-of-binding-hole-3 ()
+  (should (string=
+           "(p0 [RTerm] (f0 [RTerm]) -> p0 RExpression (f0 RExpression)) -> RExpression -> [Term]"
+           (th--get-hole-type (hth/load-hole 3)))))
+
 (provide 'haskell-type-hole-tests)
