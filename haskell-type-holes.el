@@ -5,9 +5,9 @@
   nil
   " ‘_’"
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-k C-h") 'th-resolve-hole-via-hoogle-here)
-    (define-key map (kbd "C-c C-k C-b") 'th-insert-relevant-binding-here)
-    (define-key map (kbd "C-c C-k C-f") 'th-new-function-from-hole-here)
+    (define-key map (kbd "C-c C-k C-h") 'th-resolve-hole-hoogle-here)
+    (define-key map (kbd "C-c C-k C-b") 'th-resolve-hole-relevant-bindings-here)
+    (define-key map (kbd "C-c C-k C-f") 'th-resolve-hole-new-function-here)
     (define-key map (kbd "C-c C-k C-t") 'th-toggle-type-hole-undefined-line)
     map))
 
@@ -20,11 +20,6 @@
   :type '(choice
 	  (function-item :tag "Use flycheck" th--get-type-hole-info-flycheck)
 	  (function :tag "Custom function")))
-
-(defcustom th-insert-argument-holes nil
-  "If t, insert holes for the arguments of the binding inserted."
-  :group 'haskell-type-holes
-  :type 'boolean)
 
 (defcustom th-display-type-after-hole-insertion t
   "If t, use `message' to display the inserted binding with type."
@@ -43,7 +38,18 @@
   (string-match "Found hole ‘_’\\(\n\s*\\)? with type: \\([\0-\377[:nonascii:]]*\\)\n\s+Where:" str)
   (s-collapse-whitespace (replace-regexp-in-string "\n" "" (match-string 2 str))))
 
-(defun th-new-function-from-hole (str &optional add-parens add-arg-holes)
+(defun th-insert-relevant-binding (str &optional add-parens add-arg-holes)
+  (let* ((bindings (th-relevant-hole-bindings str))
+         (binding (funcall completing-read-function "Which binding? " bindings)))
+    (th--replace-type-hole binding)))
+
+(defun th-resolve-hole-relevant-bindings-here (arg)
+  (interactive "p")
+  (let ((add-parens (>= arg 4))
+        (add-arg-holes (>= arg 16)))
+    (th-insert-relevant-binding (funcall th-get-type-hole-info-function) add-parens add-arg-holes)))
+
+(defun th-resolve-hole-new-function(str &optional add-parens add-arg-holes)
   (let* ((fn-name (read-string "Name for new function: "))
          (fn-with-type (concat fn-name " :: " (th--get-hole-type str) "\n" fn-name " = _"))
          (fn-with-arg-holes (if add-arg-holes
@@ -61,12 +67,13 @@
       (newline 1)
       (delete-blank-lines))))
 
-(defun th-new-function-from-hole-here (arg)
+(defun th-resolve-hole-new-function-here (arg)
   "With one prefix arg (C-u), insert parentheses, with two (C-u C-u) insert parens and argument holes"
   (interactive "p")
   (let ((add-parens (>= arg 4))
         (add-arg-holes (>= arg 16)))
-    (th-new-function-from-hole (funcall th-get-type-hole-info-function) add-parens add-arg-holes)))
+    (th-resolve-hole-new-function
+     (funcall th-get-type-hole-info-function) add-parens add-arg-holes)))
 
 (defun th-relevant-hole-bindings (str)
   (with-temp-buffer
@@ -88,19 +95,11 @@
 [[:space:]]*(" " (" bindings))))))
         cleaned-bindings))))
 
-
-(defun th-insert-relevant-binding (str)
-  (let* ((bindings (append '("undefined :: a")
-                           (th-relevant-hole-bindings str)
-                           '( "_ . _ :: composition" "_ $ _ :: application")))
-         (binding (funcall completing-read-function "Which binding?: " bindings)))
-    (th--replace-type-hole binding)))
-
-(defun th--replace-type-hole (binding)
+(defun th--replace-type-hole (binding &optional add-arg-holes)
   (let ((name (th--binding-extract-name binding)))
     (if (looking-at "_")
         (progn (delete-char 1)
-               (insert (if th-insert-argument-holes
+               (insert (if add-arg-holes
                            (s-join " " `(,name
                                          ,@(-repeat (th--num-of-args binding) "_")))
                          name))
@@ -110,10 +109,6 @@
 
 (defun th--create-arg-holes (fn-type)
   (s-join " " (-repeat (th--num-of-args fn-type) "_")))
-
-(defun th-insert-relevant-binding-here ()
-  (interactive)
-  (th-insert-relevant-binding (funcall th-get-type-hole-info-function)))
 
 (defun th--binding-extract-name (binding)
   (replace-regexp-in-string " :: .*" "" binding))
@@ -136,15 +131,15 @@
   (end-of-line)
   (newline 2))
 
-(defun th-resolve-hole-via-hoogle (str)
+(defun th-resolve-hole-hoogle (str)
   (let ((hole-type (th--get-hole-type str)))
     (funcall completing-read-function "What to insert: " (th-hoogle-search hole-type))))
 
-(defun th-resolve-hole-via-hoogle-here ()
+(defun th-resolve-hole-hoogle-here ()
   (interactive)
   (th--replace-type-hole
    (th--hoogle-extract-name
-    (th-resolve-hole-via-hoogle
+    (th-resolve-hole-hoogle
      (funcall th-get-type-hole-info-function)))))
 
 (defun th--hoogle-extract-name (str)
