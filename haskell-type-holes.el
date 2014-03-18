@@ -100,17 +100,26 @@
 [[:space:]]*(" " (" bindings))))))
         cleaned-bindings))))
 
-(defun th--replace-type-hole (binding &optional add-arg-holes)
+(defun th--replace-type-hole (binding &optional add-parens add-arg-holes)
+  (if (looking-at "_")
+      (progn (delete-char 1)
+             (insert (th--maybe-add-parens (if add-arg-holes
+                         (th--binding-name-with-arg-holes binding)
+                         (th--binding-extract-name binding)) (not add-parens)))
+             (if th-display-type-after-hole-insertion
+                 (message binding)))
+    (message "Not on a type hole.")))
+
+(defun th--maybe-add-parens (str &optional do-nothing)
+  (if (or do-nothing
+          (and (s-starts-with? "(" str)
+               (s-ends-with? ")" str)))
+      str
+    (concat "(" str ")")))
+
+(defun th--binding-name-with-arg-holes (binding)
   (let ((name (th--binding-extract-name binding)))
-    (if (looking-at "_")
-        (progn (delete-char 1)
-               (insert (if add-arg-holes
-                           (s-join " " `(,name
-                                         ,@(-repeat (th--num-of-args binding) "_")))
-                         name))
-               (if th-display-type-after-hole-insertion
-                   (message binding)))
-      (message "Not on a type hole."))))
+    (s-join " " `(,name ,@(-repeat (th--num-of-args binding) "_")))))
 
 (defun th--create-arg-holes (fn-type)
   (s-join " " (-repeat (th--num-of-args fn-type) "_")))
