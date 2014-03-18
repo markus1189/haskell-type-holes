@@ -42,7 +42,7 @@
 (defun th-insert-relevant-binding (str &optional add-parens add-arg-holes)
   (let* ((bindings (th-relevant-hole-bindings str))
          (binding (funcall completing-read-function "Which binding? " bindings)))
-    (th--replace-type-hole binding)))
+    (th--replace-type-hole binding add-parens add-arg-holes)))
 
 (defun th-resolve-hole-relevant-bindings-here (arg)
   (interactive "p")
@@ -52,14 +52,13 @@
 
 (defun th-resolve-hole-new-function(str &optional add-parens add-arg-holes)
   (let* ((fn-name (read-string "Name for new function: "))
-         (fn-with-type (concat fn-name " :: " (th--get-hole-type str) "\n" fn-name " = _"))
-         (fn-with-arg-holes (if add-arg-holes
-                                (s-join " " (list fn-name
-                                                  (th--create-arg-holes fn-with-type)))
-                              fn-name)))
-    (th--replace-type-hole (if add-parens
-                               (concat "(" fn-with-arg-holes ")")
-                             fn-with-arg-holes))
+         (fn-with-type (concat fn-name
+                               " :: "
+                               (th--get-hole-type str)
+                               "\n"
+                               fn-name
+                               " = _")))
+    (th--replace-type-hole fn-with-type add-parens add-arg-holes)
     (funcall th-new-function-from-hole-position)
     (insert fn-with-type)
     (backward-char 1)
