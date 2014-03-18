@@ -9,6 +9,7 @@
     (define-key map (kbd "C-c C-k C-b") 'th-resolve-hole-relevant-bindings-here)
     (define-key map (kbd "C-c C-k C-f") 'th-resolve-hole-new-function-here)
     (define-key map (kbd "C-c C-k C-t") 'th-toggle-type-hole-undefined-line)
+    (define-key map (kbd "C-c C-k TAB") 'th-resolve-hole-prompt)
     map))
 
 (defun th--get-type-hole-info-flycheck ()
@@ -66,6 +67,10 @@
       (end-of-line)
       (newline 1)
       (delete-blank-lines))))
+
+(defun th-resolve-hole-prompt (str)
+  (interactive "sEnter replacement for hole: ")
+  (th--replace-type-hole str))
 
 (defun th-resolve-hole-new-function-here (arg)
   "With one prefix arg (C-u), insert parentheses, with two (C-u C-u) insert parens and argument holes"
